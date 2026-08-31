@@ -27,7 +27,9 @@ npx @odiak/bckle
 
 1. **接続** — Backlogのスペースドメイン（`example.backlog.jp` / `example.backlog.com`）と
    APIキーを入力します。APIキーはBacklogの「個人設定 → API」で発行できます。
-   全プロジェクト・全ユーザー情報の取得には管理者権限のあるユーザーのキーを推奨します。
+   **完全なエクスポートには管理者権限のあるユーザーのキーを推奨します**。
+   管理者以外のキーでも、参加しているプロジェクトのエクスポートは可能です
+   （ユーザー一覧は選択プロジェクトのメンバーのみになります）。
 2. **プロジェクト選択** — エクスポートするプロジェクトを選び、添付ファイルの有無と
    出力先フォルダを指定します。
 3. **実行** — 進捗が表示されます。Backlog APIのレート制限に達した場合は自動で待機します。
@@ -122,8 +124,9 @@ Then just follow the on-screen steps:
 
 1. **Connect** — Enter your Backlog space domain (`example.backlog.jp` / `example.backlog.com`)
    and API key. You can issue an API key from Backlog's "Personal Settings → API".
-   A key from a user with administrator privileges is recommended for exporting
-   all projects and all user information.
+   **A key from a user with administrator privileges is recommended for a complete export.**
+   Non-admin keys also work for exporting the projects you belong to
+   (the user list will then contain only the members of the selected projects).
 2. **Select projects** — Choose the projects to export, whether to include attachments,
    and the output folder.
 3. **Run** — Progress is displayed. When the Backlog API rate limit is reached, the tool

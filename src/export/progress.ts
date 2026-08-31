@@ -33,6 +33,8 @@ export interface ExportProgress {
   spaceDomain: string
   includeAttachments: boolean
   usersDone: boolean
+  /** users.json の取得範囲。space=スペース全体 / projectMembers=選択プロジェクトのメンバーのみ（権限不足時のフォールバック） */
+  usersScope?: 'space' | 'projectMembers'
   /** projectKey -> progress */
   projects: Record<string, ProjectProgress>
   projectKeys: string[]

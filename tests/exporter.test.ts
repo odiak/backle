@@ -119,6 +119,51 @@ describe('Exporter', () => {
     expect(events.some((e) => e.type === 'projectDone')).toBe(true)
   })
 
+  it('ユーザー一覧が権限不足（403）の場合は選択プロジェクトのメンバーにフォールバックする', async () => {
+    const issue = { id: 101, issueKey: 'PROJ-1', summary: 'test issue', attachments: [] }
+    const fetchFn = createRoutedFetch({
+      '/api/v2/space': { spaceKey: 'example', name: 'Example Space' },
+      '/api/v2/users': new Response(JSON.stringify({ errors: [{ message: '', code: 5 }] }), {
+        status: 403,
+      }),
+      '/api/v2/projects/PROJ': { id: 10, projectKey: 'PROJ', name: 'Project' },
+      '/api/v2/projects/PROJ/users': [
+        { id: 1, name: 'member1' },
+        { id: 2, name: 'member2' },
+      ],
+      '/api/v2/projects/PROJ/issueTypes': [],
+      '/api/v2/projects/PROJ/categories': [],
+      '/api/v2/projects/PROJ/versions': [],
+      '/api/v2/projects/PROJ/customFields': [],
+      '/api/v2/projects/PROJ/statuses': [],
+      '/api/v2/issues/count': { count: 1 },
+      '/api/v2/issues': [issue],
+      '/api/v2/issues/PROJ-1/comments': [],
+      '/api/v2/wikis': [],
+    })
+    const client = new BacklogClient({
+      baseUrl: 'https://example.backlog.jp',
+      apiKey: 'k',
+      fetchFn,
+    })
+    const exporter = new Exporter({
+      client,
+      spaceDomain: 'example.backlog.jp',
+      outputDir,
+      projectKeys: ['PROJ'],
+      includeAttachments: false,
+    })
+    const events: ExporterEvent[] = []
+    exporter.onEvent((e) => events.push(e))
+    await exporter.run()
+
+    expect(events.at(-1)).toEqual({ type: 'done', outputDir })
+    const users = JSON.parse(await readFile(join(outputDir, 'users.json'), 'utf8'))
+    expect(users.map((u: { id: number }) => u.id).sort()).toEqual([1, 2])
+    const manifest = JSON.parse(await readFile(join(outputDir, 'manifest.json'), 'utf8'))
+    expect(manifest.usersScope).toBe('projectMembers')
+  })
+
   it('Wikiが利用できないスペース（403）ではWikiをスキップして完走する', async () => {
     const issue = { id: 101, issueKey: 'PROJ-1', summary: 'test issue', attachments: [] }
     const fetchFn = createRoutedFetch({

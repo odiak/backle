@@ -163,10 +163,45 @@ export class Exporter {
     if (!progress.usersDone) {
       this.checkAborted()
       this.emit({ type: 'phase', projectKey: null, phase: 'users', message: 'ユーザー一覧取得' })
-      const users = await this.client.fetchAll<BacklogUser>('/api/v2/users')
+      let users: BacklogUser[]
+      try {
+        users = await this.client.fetchAll<BacklogUser>('/api/v2/users')
+        progress.usersScope = 'space'
+      } catch (e) {
+        if (!(e instanceof BacklogApiError && e.status === 403)) throw e
+        // スペース全体のユーザー一覧は管理者権限が必要。権限がない場合は
+        // 選択プロジェクトのメンバー一覧にフォールバックする
+        this.emit({
+          type: 'phase',
+          projectKey: null,
+          phase: 'users',
+          message: 'ユーザー一覧は権限不足のため、選択プロジェクトのメンバーのみ取得します',
+        })
+        const byId = new Map<number, BacklogUser>()
+        for (const projectKey of this.options.projectKeys) {
+          try {
+            const members = await this.client.fetchAll<BacklogUser>(
+              `/api/v2/projects/${projectKey}/users`,
+            )
+            for (const m of members) byId.set(m.id, m)
+          } catch {
+            // このプロジェクトのメンバー一覧も取得できない場合はスキップ
+          }
+        }
+        users = [...byId.values()]
+        progress.usersScope = 'projectMembers'
+      }
       await writeFile(join(this.outputDir, 'users.json'), JSON.stringify(users, null, 2))
       progress.usersDone = true
       await save()
+    }
+
+    // manifest に users.json の取得範囲を反映（manifestは毎回書き直されるため、レジューム時も含めて毎回）
+    if (progress.usersScope !== undefined) {
+      const manifestPath = join(this.outputDir, 'manifest.json')
+      const current = JSON.parse(await readFile(manifestPath, 'utf8')) as Record<string, unknown>
+      current.usersScope = progress.usersScope
+      await writeFile(manifestPath, JSON.stringify(current, null, 2))
     }
 
     // プロジェクトごとのエクスポート

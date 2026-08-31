@@ -41,18 +41,24 @@ export/
   "exportedAt": "2026-08-31T12:00:00.000Z",
   "space": { "domain": "example.backlog.jp", "spaceKey": "example", "name": "..." },
   "options": { "includeAttachments": true },
-  "projects": ["PROJ1", "PROJ2"]
+  "projects": ["PROJ1", "PROJ2"],
+  "usersScope": "space"
 }
 ```
 
 - `formatVersion`: この仕様のバージョン。文字列。
 - `space`: `GET /api/v2/space` のレスポンスに `domain` を追加したもの。
 - `projects`: エクスポート対象のプロジェクトキー一覧。
+- `usersScope`: users.json の取得範囲。`"space"`（スペース全体）または
+  `"projectMembers"`（権限不足によるフォールバック。エクスポート対象プロジェクトのメンバーのみ）。
 
 ### users.json
 
 `GET /api/v2/users` のレスポンス（配列）そのまま。
 APIキーの権限が管理者でない場合、`mailAddress` が取得できないことがあります。
+また、スペース全体のユーザー一覧の取得には管理者権限が必要なため、権限がない場合は
+エクスポート対象プロジェクトのメンバー一覧（`GET /api/v2/projects/:key/users` の和集合）に
+フォールバックします（manifest の `usersScope` が `"projectMembers"` になります）。
 
 ### projects/{projectKey}/project.json
 
