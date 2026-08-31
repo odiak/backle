@@ -26,7 +26,7 @@ describe('Exporter', () => {
   let outputDir: string
 
   beforeEach(async () => {
-    outputDir = await mkdtemp(join(tmpdir(), 'taskame-export-test-'))
+    outputDir = await mkdtemp(join(tmpdir(), 'backle-test-'))
   })
 
   afterEach(async () => {

@@ -1,12 +1,21 @@
 {
-  "name": "taskame-export",
+  "name": "backle",
   "version": "0.1.0",
-  "description": "Backlogのデータをあなた自身のPC上でエクスポートするGUI付きツール",
+  "description": "Backlog exporter — Backlogのデータをあなた自身のPC上でエクスポートするGUI付きツール",
+  "keywords": [
+    "backlog",
+    "export",
+    "backup"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/odiak/backle.git"
+  },
   "license": "MIT",
   "author": "Kaido Iwamoto",
   "type": "module",
   "bin": {
-    "taskame-export": "./dist/cli.js"
+    "backle": "./dist/cli.js"
   },
   "files": [
     "dist",

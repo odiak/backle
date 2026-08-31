@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createApp } from './server/app.js'
 
-const PORT = Number(process.env.TASKAME_EXPORT_PORT ?? 7810)
+const PORT = Number(process.env.BACKLE_PORT ?? 7810)
 
 const here = dirname(fileURLToPath(import.meta.url))
 // ビルド後の配置: dist/cli.js と dist/gui/
@@ -23,7 +23,7 @@ const { app } = createApp({ guiDir })
 
 serve({ fetch: app.fetch, port: PORT, hostname: '127.0.0.1' }, (info) => {
   const url = `http://localhost:${info.port}`
-  console.log(`taskame-export を起動しました: ${url}`)
+  console.log(`backle を起動しました: ${url}`)
   console.log('データはあなたのPCの外には送信されません。終了するには Ctrl+C を押してください。')
   openBrowser(url)
 })
