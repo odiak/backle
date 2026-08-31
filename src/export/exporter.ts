@@ -54,9 +54,21 @@ class AbortedError extends Error {
   }
 }
 
-/** ファイル名に使えない文字を置換 */
+/**
+ * ファイル名に使えない文字・名前を置換する。
+ * Windowsの制約（禁止文字、CON/NUL等の予約名、末尾のドット・空白）にも対応する。
+ */
 export function sanitizeFilename(name: string): string {
-  return name.replace(/[\/\\:*?"<>|\x00-\x1f]/g, '_')
+  let result = name.replace(/[\/\\:*?"<>|\x00-\x1f]/g, '_')
+  // Windowsでは末尾のドット・空白が無視され衝突や失敗の原因になる
+  result = result.replace(/[. ]+$/, '')
+  if (result === '') return '_'
+  // Windows予約名（拡張子付きも不可: 例 con.txt）
+  const stem = result.split('.')[0] ?? result
+  if (/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i.test(stem)) {
+    result = `_${result}`
+  }
+  return result
 }
 
 export class Exporter {

@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { openOutputFolder } from '../api'
+
 export function DoneStep({
   outputDir,
   onRestart,
@@ -5,6 +8,8 @@ export function DoneStep({
   outputDir: string
   onRestart: () => void
 }) {
+  const [openError, setOpenError] = useState<string | null>(null)
+
   return (
     <div className="space-y-6">
       <div className="rounded border border-green-300 bg-green-50 p-4">
@@ -19,12 +24,25 @@ export function DoneStep({
         形式の仕様は同梱の docs/format-v1.md を参照してください。
       </p>
 
-      <button
-        onClick={onRestart}
-        className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700"
-      >
-        別のプロジェクトをエクスポートする
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={() => {
+            void openOutputFolder().then((res) => {
+              setOpenError(res.ok ? null : (res.error ?? 'フォルダを開けませんでした'))
+            })
+          }}
+          className="rounded bg-blue-600 px-4 py-2 text-sm text-white"
+        >
+          出力フォルダを開く
+        </button>
+        <button
+          onClick={onRestart}
+          className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700"
+        >
+          別のプロジェクトをエクスポートする
+        </button>
+      </div>
+      {openError !== null && <p className="text-sm text-red-600">{openError}</p>}
     </div>
   )
 }

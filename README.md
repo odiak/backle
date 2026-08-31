@@ -66,6 +66,14 @@ pnpm dev          # ローカルサーバー起動（要: 事前に pnpm build:g
 pnpm dev:gui      # GUI開発サーバー（Vite。APIは :7810 にプロキシ）
 pnpm test         # ユニットテスト
 pnpm typecheck    # 型チェック
+
+# 実Backlogスペースを使う結合テスト（.env.example を .env にコピーして設定）
+pnpm test:integration
+
+# Electron版（デスクトップアプリ）
+pnpm dev:electron # 起動
+pnpm dist:mac     # macOS向けパッケージ（dmg）
+pnpm dist:win     # Windows向けパッケージ（NSIS）
 ```
 
 ## 免責
@@ -151,6 +159,14 @@ pnpm dev          # start local server (run pnpm build:gui first)
 pnpm dev:gui      # GUI dev server (Vite; API proxied to :7810)
 pnpm test         # unit tests
 pnpm typecheck    # type check
+
+# Integration tests against a real Backlog space (copy .env.example to .env)
+pnpm test:integration
+
+# Electron (desktop app)
+pnpm dev:electron # run
+pnpm dist:mac     # package for macOS (dmg)
+pnpm dist:win     # package for Windows (NSIS)
 ```
 
 ## Disclaimer

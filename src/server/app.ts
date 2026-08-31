@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
+import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, extname, normalize } from 'node:path'
@@ -22,6 +23,15 @@ const MIME_TYPES: Record<string, string> = {
 export interface CreateAppOptions {
   /** ビルド済みGUI（vite build の出力）のディレクトリ */
   guiDir: string
+}
+
+/** OSのファイルマネージャ（Finder / Explorer 等）でフォルダを開く */
+function openInFileManager(path: string): void {
+  const platform = process.platform
+  const cmd =
+    platform === 'darwin' ? 'open' : platform === 'win32' ? 'explorer' : 'xdg-open'
+  const child = spawn(cmd, [path], { stdio: 'ignore', detached: true })
+  child.unref()
 }
 
 export function createApp(options: CreateAppOptions): { app: Hono; state: AppState } {
@@ -161,6 +171,22 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
         }
       }
     })
+  })
+
+  // 出力フォルダをOSのファイルマネージャで開く。
+  // 任意パスは開かせず、現在のジョブの出力先のみ許可する。
+  app.post('/api/open-output', (c) => {
+    const job = state.job
+    if (!job) return c.json({ ok: false, error: 'エクスポートが実行されていません' }, 400)
+    try {
+      openInFileManager(job.outputDir)
+      return c.json({ ok: true })
+    } catch (e) {
+      return c.json(
+        { ok: false, error: e instanceof Error ? e.message : String(e) },
+        500,
+      )
+    }
   })
 
   app.get('/api/status', (c) => {

@@ -1,0 +1,47 @@
+name: Release
+
+# vX.Y.Z タグのpushでElectronアプリをビルドし、GitHub Releasesのドラフトに添付する。
+# macOS: 署名・公証はリポジトリにシークレット（CSC_LINK等）が設定されている場合のみ。
+#        未設定ならelectron-builderが自動スキップし未署名ビルドになる。
+# Windows: 当面未署名のベストエフォート配布（SmartScreen警告あり）。
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            script: dist:mac
+            artifacts: release/*.dmg
+          - os: windows-latest
+            script: dist:win
+            artifacts: release/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm ${{ matrix.script }}
+        env:
+          # macOS署名・公証（シークレット未設定なら未署名でビルドされる）
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Attach to release draft
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: ${{ matrix.artifacts }}

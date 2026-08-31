@@ -1,0 +1,25 @@
+appId: net.odiak.backle
+productName: backle
+directories:
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+  - docs/format-v1.md
+  - package.json
+mac:
+  target:
+    - target: dmg
+      arch: universal
+  category: public.app-category.developer-tools
+  # 署名・公証はCIで環境変数（CSC_LINK等）が設定されている場合のみ行われる。
+  # 未設定ならelectron-builderが自動でスキップし、未署名ビルドになる。
+win:
+  target:
+    - target: nsis
+      arch: x64
+  # Windowsは当面未署名のベストエフォート配布（SmartScreen警告あり）
+nsis:
+  oneClick: true
+  deleteAppDataOnUninstall: true
+npmRebuild: false

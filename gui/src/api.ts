@@ -43,6 +43,10 @@ export async function abortExport(): Promise<{ ok: boolean }> {
   return await postJson('/api/export/abort', {})
 }
 
+export async function openOutputFolder(): Promise<{ ok: boolean; error?: string }> {
+  return await postJson('/api/open-output', {})
+}
+
 export async function checkResumable(
   outputDir: string,
 ): Promise<{ ok: boolean; resumable?: boolean }> {

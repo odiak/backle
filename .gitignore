@@ -3,3 +3,7 @@ dist/
 .local/
 *.log
 .DS_Store
+.env
+mise.local.toml
+dist-electron/
+release/
