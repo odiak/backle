@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { BacklogClient } from '../src/backlog/client.js'
 import { Exporter, type ExporterEvent } from '../src/export/exporter.js'
 
-function createRoutedFetch(routes: Record<string, unknown>) {
+function createRoutedFetch(routes: Record<string, unknown | ((url: URL) => unknown)>) {
   const fetchFn = (async (input: string | URL | Request) => {
     const url = new URL(String(input))
     const key = url.pathname
@@ -16,7 +16,8 @@ function createRoutedFetch(routes: Record<string, unknown>) {
     }
     const route = routes[key]
     if (route instanceof Response) return route.clone()
-    return new Response(JSON.stringify(route), {
+    const data = typeof route === 'function' ? route(url) : route
+    return new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
@@ -51,7 +52,12 @@ describe('Exporter', () => {
       '/api/v2/issues/PROJ-1/comments': [{ id: 501, content: 'a comment' }],
       '/api/v2/wikis': [{ id: 900, name: 'Home' }],
       '/api/v2/wikis/900': { id: 900, name: 'Home', content: 'wiki body', attachments: [] },
-      '/api/v2/wikis/900/history': [{ version: 1 }],
+      // 履歴APIは最大10件/ページ（実地検証済みの挙動を再現）: 全25版をminIdでページング
+      '/api/v2/wikis/900/history': (url: URL) => {
+        const minId = Number(url.searchParams.get('minId') ?? 0)
+        const versions = Array.from({ length: 25 }, (_, i) => i + 1).filter((v) => v > minId)
+        return versions.slice(0, 10).map((version) => ({ version, content: `v${version}` }))
+      },
     })
     const client = new BacklogClient({
       baseUrl: 'https://example.backlog.jp',
@@ -99,7 +105,12 @@ describe('Exporter', () => {
       .trim()
       .split('\n')
     expect(wikiLines).toHaveLength(1)
-    expect(JSON.parse(wikiLines[0]!).history).toEqual([{ version: 1 }])
+    // 履歴が10件/ページの制約を越えて全25版取得できている
+    const history = JSON.parse(wikiLines[0]!).history
+    expect(history).toHaveLength(25)
+    expect(history.map((h: { version: number }) => h.version)).toEqual(
+      Array.from({ length: 25 }, (_, i) => i + 1),
+    )
 
     // 完了時には進捗ファイルが削除されている
     await expect(stat(join(outputDir, 'progress.json'))).rejects.toThrow()

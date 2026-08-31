@@ -338,9 +338,7 @@ export class Exporter {
         const summary = wikiList[i]
         if (summary === undefined) continue
         const wiki = await this.client.requestJson<BacklogWiki>(`/api/v2/wikis/${summary.id}`)
-        const history = await this.client.fetchAll<unknown>(
-          `/api/v2/wikis/${summary.id}/history`,
-        )
+        const history = await this.fetchWikiHistory(summary.id)
         await appendFile(wikisPath, JSON.stringify({ ...wiki, history }) + '\n')
         pp.wikiIndex = i + 1
         pp.wikiCount++
@@ -395,6 +393,27 @@ export class Exporter {
       pp.phase = 'done'
       await save()
     }
+  }
+
+  /**
+   * Wiki履歴を全件取得する。
+   * 履歴APIは count 指定に関わらず最大10件/ページしか返さないため（実地検証済み）、
+   * minId（= version 値）で昇順にページングして全件を辿る。
+   */
+  private async fetchWikiHistory(wikiId: number): Promise<unknown[]> {
+    const pageSize = 10
+    const all: Array<{ version: number }> = []
+    let minId = 0
+    for (;;) {
+      const page = await this.client.requestJson<Array<{ version: number }>>(
+        `/api/v2/wikis/${wikiId}/history`,
+        { minId, count: pageSize, order: 'asc' },
+      )
+      all.push(...page)
+      if (page.length < pageSize) break
+      minId = Math.max(...page.map((e) => e.version))
+    }
+    return all
   }
 
   private projectIdCache = new Map<string, number>()
