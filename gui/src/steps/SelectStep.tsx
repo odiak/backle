@@ -5,25 +5,39 @@ import type { ExportConfig } from '../App'
 export function SelectStep({
   spaceName,
   onStart,
+  onBack,
 }: {
   spaceName: string
   onStart: (config: ExportConfig) => void
+  onBack: () => void
 }) {
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [includeAttachments, setIncludeAttachments] = useState(true)
   const [outputDir, setOutputDir] = useState('')
   const [resumable, setResumable] = useState(false)
   const [error, setError] = useState('')
 
+  const loadProjects = () => {
+    setLoadError(null)
+    setProjects(null)
+    void fetchProjects()
+      .then((result) => {
+        if (result.ok) {
+          setProjects(result.projects)
+        } else {
+          setLoadError(result.error)
+        }
+      })
+      .catch((e: unknown) => {
+        setLoadError(e instanceof Error ? e.message : String(e))
+      })
+  }
+
   useEffect(() => {
-    void fetchProjects().then((result) => {
-      if (result.ok) {
-        setProjects(result.projects)
-      } else {
-        setError(result.error)
-      }
-    })
+    loadProjects()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -70,7 +84,25 @@ export function SelectStep({
 
       <div>
         <h2 className="text-sm font-medium text-gray-700">プロジェクト</h2>
-        {projects === null ? (
+        {loadError !== null ? (
+          <div className="mt-2 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+            <p className="m-0">プロジェクト一覧の取得に失敗しました: {loadError}</p>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={loadProjects}
+                className="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white"
+              >
+                再試行
+              </button>
+              <button
+                onClick={onBack}
+                className="rounded border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700"
+              >
+                接続画面に戻る
+              </button>
+            </div>
+          </div>
+        ) : projects === null ? (
           <p className="mt-2 text-sm text-gray-500">読み込み中…</p>
         ) : projects.length === 0 ? (
           <p className="mt-2 text-sm text-gray-500">プロジェクトが見つかりません</p>

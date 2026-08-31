@@ -63,6 +63,7 @@ export function App() {
               setConfig(c)
               setStep('run')
             }}
+            onBack={() => setStep('connect')}
           />
         )}
         {step === 'run' && config && (
