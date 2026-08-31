@@ -76,6 +76,11 @@ pnpm dist:mac     # macOS向けパッケージ（dmg）
 pnpm dist:win     # Windows向けパッケージ（NSIS）
 ```
 
+## フィードバック・コントリビュート
+
+- バグ報告や要望は [GitHubのIssue](https://github.com/odiak/bckle/issues) でお寄せください。プルリクエストも歓迎します
+- プロジェクト管理ツールなどを開発している会社・開発者の方が、移行元ツールとして本ツールを利用・紹介していただくことを歓迎します。お使いのツール向けのオプション追加のご提案（Issue / プルリクエスト）もぜひどうぞ
+
 ## 免責
 
 本ツールは無保証で提供されます（MITライセンス）。
@@ -168,6 +173,11 @@ pnpm dev:electron # run
 pnpm dist:mac     # package for macOS (dmg)
 pnpm dist:win     # package for Windows (NSIS)
 ```
+
+## Feedback & Contributing
+
+- Please report bugs and feature requests via [GitHub Issues](https://github.com/odiak/bckle/issues). Pull requests are welcome
+- Companies and developers building project management tools are welcome to use or mention this tool as a migration source for their own services. Proposals to add options for your tool (via issues or pull requests) are also appreciated
 
 ## Disclaimer
 
