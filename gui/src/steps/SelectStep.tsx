@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
-import { fetchProjects, checkResumable, type ProjectSummary } from '../api'
+import {
+  fetchProjects,
+  fetchStatus,
+  checkResumable,
+  pickFolder,
+  type ProjectSummary,
+} from '../api'
 import type { ExportConfig } from '../App'
 
 export function SelectStep({
@@ -37,8 +43,29 @@ export function SelectStep({
 
   useEffect(() => {
     loadProjects()
+    // 出力先のデフォルト値をサーバーから取得して自動入力
+    void fetchStatus().then((s) => {
+      if (s.defaultOutputDir) {
+        setOutputDir((prev) => (prev === '' ? s.defaultOutputDir! : prev))
+      }
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const [pickError, setPickError] = useState('')
+
+  const browseFolder = async () => {
+    setPickError('')
+    const result = await pickFolder()
+    if (result.ok) {
+      if (result.path) setOutputDir(result.path)
+      // nullはキャンセル: 何もしない
+    } else {
+      setPickError(
+        `フォルダ選択ダイアログを開けませんでした（${result.error ?? '不明なエラー'}）。パスを直接入力してください。`,
+      )
+    }
+  }
 
   useEffect(() => {
     if (outputDir.trim() === '') {
@@ -159,13 +186,26 @@ export function SelectStep({
 
       <div>
         <label className="block text-sm font-medium text-gray-700">出力先フォルダ</label>
-        <input
-          type="text"
-          value={outputDir}
-          onChange={(e) => setOutputDir(e.target.value)}
-          placeholder="/Users/you/backlog-export"
-          className="mt-1 w-full rounded border border-gray-300 px-3 py-2 font-mono text-sm"
-        />
+        <div className="mt-1 flex gap-2">
+          <input
+            type="text"
+            value={outputDir}
+            onChange={(e) => setOutputDir(e.target.value)}
+            placeholder="/Users/you/backlog-export"
+            className="w-full rounded border border-gray-300 px-3 py-2 font-mono text-sm"
+          />
+          <button
+            type="button"
+            onClick={() => void browseFolder()}
+            className="shrink-0 rounded border border-gray-300 px-3 py-2 text-sm text-gray-700"
+          >
+            選択…
+          </button>
+        </div>
+        {pickError !== '' && <p className="mt-1 text-xs text-red-600">{pickError}</p>}
+        <p className="mt-1 text-xs text-gray-500">
+          存在しないフォルダを指定した場合は自動で作成されます。
+        </p>
         {resumable && (
           <p className="mt-1 text-xs text-amber-700">
             このフォルダには中断されたエクスポートの進捗があります。開始すると続きから再開します。

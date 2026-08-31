@@ -4,7 +4,7 @@
  * コアは完全に共通で、Electronは「配布の皮」に徹する。
  */
 import { serve, type ServerType } from '@hono/node-server'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog } from 'electron'
 import { join } from 'node:path'
 import { createApp } from '../src/server/app.js'
 
@@ -13,7 +13,17 @@ let server: ServerType | null = null
 function startServer(): Promise<number> {
   // GUIのビルド成果物はパッケージ内の dist/gui にある
   const guiDir = join(app.getAppPath(), 'dist', 'gui')
-  const { app: hono } = createApp({ guiDir })
+  const { app: hono } = createApp({
+    guiDir,
+    // フォルダ選択はElectronのネイティブダイアログで
+    pickFolder: async () => {
+      const result = await dialog.showOpenDialog({
+        title: 'エクスポートの出力先フォルダを選択',
+        properties: ['openDirectory', 'createDirectory'],
+      })
+      return result.canceled ? null : (result.filePaths[0] ?? null)
+    },
+  })
   return new Promise((resolve) => {
     // 既定はポート0（OSに空きポートを割り当てさせ、npx版の7810と衝突しない）
     const port = Number(process.env.BCKLE_PORT ?? 0)

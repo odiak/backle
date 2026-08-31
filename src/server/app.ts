@@ -9,6 +9,7 @@ import type { BacklogProject, BacklogSpace } from '../backlog/types.js'
 import { Exporter } from '../export/exporter.js'
 import { loadProgress } from '../export/progress.js'
 import { AppState, ExportJob } from './state.js'
+import { defaultOutputDir, pickFolderNative } from './pickFolder.js'
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -23,6 +24,9 @@ const MIME_TYPES: Record<string, string> = {
 export interface CreateAppOptions {
   /** ビルド済みGUI（vite build の出力）のディレクトリ */
   guiDir: string
+  /** フォルダ選択ダイアログの実装（Electron版はdialogベースの実装を注入する）。
+   * キャンセル時は null を返す。省略時はOSネイティブのダイアログを使う。 */
+  pickFolder?: () => Promise<string | null>
 }
 
 /** OSのファイルマネージャ（Finder / Explorer 等）でフォルダを開く */
@@ -185,6 +189,20 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
     })
   })
 
+  // フォルダ選択ダイアログを開く（ブラウザからは絶対パスを扱えないためサーバー側で開く）
+  app.post('/api/pick-folder', async (c) => {
+    try {
+      const pick = options.pickFolder ?? pickFolderNative
+      const path = await pick()
+      return c.json({ ok: true, path })
+    } catch (e) {
+      return c.json(
+        { ok: false, error: e instanceof Error ? e.message : String(e) },
+        500,
+      )
+    }
+  })
+
   // 出力フォルダをOSのファイルマネージャで開く。
   // 任意パスは開かせず、現在のジョブの出力先のみ許可する。
   app.post('/api/open-output', (c) => {
@@ -204,6 +222,7 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
   app.get('/api/status', (c) => {
     return c.json({
       envCredentials: Boolean(process.env.BACKLOG_DOMAIN && process.env.BACKLOG_API_KEY),
+      defaultOutputDir: defaultOutputDir(),
       connected: state.connection !== null,
       spaceName: state.connection?.spaceName ?? null,
       spaceDomain: state.connection?.spaceDomain ?? null,

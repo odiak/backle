@@ -49,6 +49,22 @@ export async function openOutputFolder(): Promise<{ ok: boolean; error?: string 
   return await postJson('/api/open-output', {})
 }
 
+export async function pickFolder(): Promise<{
+  ok: boolean
+  path?: string | null
+  error?: string
+}> {
+  return await postJson('/api/pick-folder', {})
+}
+
+export async function fetchStatus(): Promise<{
+  envCredentials?: boolean
+  defaultOutputDir?: string
+}> {
+  const res = await fetch('/api/status')
+  return await res.json()
+}
+
 export async function checkResumable(
   outputDir: string,
 ): Promise<{ ok: boolean; resumable?: boolean }> {
