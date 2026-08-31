@@ -26,3 +26,6 @@ nsis:
   oneClick: true
   deleteAppDataOnUninstall: true
 npmRebuild: false
+# 自動publishは使わない（CIのタグ検出でGitHubへpublishしようとしてGH_TOKEN必須になるため。
+# Releasesへの添付はワークフロー側の softprops/action-gh-release で行う）
+publish: null
