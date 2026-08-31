@@ -17,7 +17,7 @@
 Node.js 20以上が必要です。
 
 ```sh
-npx bckle
+npx @odiak/bckle
 ```
 
 を実行すると、ローカルサーバー（ http://localhost:7810 ）が起動し、ブラウザが開きます。
@@ -107,7 +107,7 @@ entirely **on your own PC**.
 Requires Node.js 20 or later.
 
 ```sh
-npx bckle
+npx @odiak/bckle
 ```
 
 This starts a local server ( http://localhost:7810 ) and opens your browser.
