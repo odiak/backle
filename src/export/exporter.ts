@@ -1,6 +1,6 @@
 import { mkdir, writeFile, appendFile, readFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import { BacklogClient, type WaitEvent } from '../backlog/client.js'
+import { BacklogApiError, BacklogClient, type WaitEvent } from '../backlog/client.js'
 import type {
   BacklogAttachment,
   BacklogComment,
@@ -308,9 +308,25 @@ export class Exporter {
     if (pp.phase === 'wikis') {
       const wikisPath = join(dir, 'wikis.jsonl')
       if (pp.wikiIndex === 0) await writeFile(wikisPath, '')
-      const wikiList = await this.client.fetchAll<BacklogWikiSummary>('/api/v2/wikis', {
-        projectIdOrKey: projectKey,
-      })
+      // Wikiが無効なスペース/プランでは一覧取得が403になるため、スキップして続行する
+      let wikiList: BacklogWikiSummary[]
+      try {
+        wikiList = await this.client.fetchAll<BacklogWikiSummary>('/api/v2/wikis', {
+          projectIdOrKey: projectKey,
+        })
+      } catch (e) {
+        if (e instanceof BacklogApiError && e.status === 403) {
+          this.emit({
+            type: 'phase',
+            projectKey,
+            phase: 'wikis',
+            message: `${projectKey}: Wikiは利用できないためスキップ`,
+          })
+          wikiList = []
+        } else {
+          throw e
+        }
+      }
       this.emit({
         type: 'phase',
         projectKey,

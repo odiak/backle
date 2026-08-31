@@ -48,14 +48,24 @@ export interface BacklogClientOptions {
   maxRetries?: number
 }
 
+/** URL中のAPIキーを伏せる（エラーメッセージ・ログ経由の漏洩防止） */
+export function redactApiKey(url: string): string {
+  return url.replace(/([?&]apiKey=)[^&]*/g, '$1***')
+}
+
 export class BacklogApiError extends Error {
+  /** APIキーを伏せたURL */
+  public readonly url: string
+
   constructor(
     public readonly status: number,
-    public readonly url: string,
+    url: string,
     public readonly body: string,
   ) {
-    super(`Backlog API error ${status} for ${url}: ${body.slice(0, 200)}`)
+    const redacted = redactApiKey(url)
+    super(`Backlog API error ${status} for ${redacted}: ${body.slice(0, 200)}`)
     this.name = 'BacklogApiError'
+    this.url = redacted
   }
 }
 

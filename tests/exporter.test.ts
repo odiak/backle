@@ -14,7 +14,9 @@ function createRoutedFetch(routes: Record<string, unknown>) {
         status: 404,
       })
     }
-    return new Response(JSON.stringify(routes[key]), {
+    const route = routes[key]
+    if (route instanceof Response) return route.clone()
+    return new Response(JSON.stringify(route), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
@@ -104,5 +106,45 @@ describe('Exporter', () => {
 
     expect(events.at(-1)).toEqual({ type: 'done', outputDir })
     expect(events.some((e) => e.type === 'projectDone')).toBe(true)
+  })
+
+  it('Wikiが利用できないスペース（403）ではWikiをスキップして完走する', async () => {
+    const issue = { id: 101, issueKey: 'PROJ-1', summary: 'test issue', attachments: [] }
+    const fetchFn = createRoutedFetch({
+      '/api/v2/space': { spaceKey: 'example', name: 'Example Space' },
+      '/api/v2/users': [{ id: 1, name: 'user1' }],
+      '/api/v2/projects/PROJ': { id: 10, projectKey: 'PROJ', name: 'Project' },
+      '/api/v2/projects/PROJ/issueTypes': [],
+      '/api/v2/projects/PROJ/categories': [],
+      '/api/v2/projects/PROJ/versions': [],
+      '/api/v2/projects/PROJ/customFields': [],
+      '/api/v2/projects/PROJ/statuses': [],
+      '/api/v2/issues/count': { count: 1 },
+      '/api/v2/issues': [issue],
+      '/api/v2/issues/PROJ-1/comments': [],
+      '/api/v2/wikis': new Response(
+        JSON.stringify({ errors: [{ message: 'msg.featureRestrictedError.title.wiki', code: 5 }] }),
+        { status: 403 },
+      ),
+    })
+    const client = new BacklogClient({
+      baseUrl: 'https://example.backlog.jp',
+      apiKey: 'k',
+      fetchFn,
+    })
+    const exporter = new Exporter({
+      client,
+      spaceDomain: 'example.backlog.jp',
+      outputDir,
+      projectKeys: ['PROJ'],
+      includeAttachments: false,
+    })
+    const events: ExporterEvent[] = []
+    exporter.onEvent((e) => events.push(e))
+    await exporter.run()
+
+    expect(events.at(-1)).toEqual({ type: 'done', outputDir })
+    const wikis = await readFile(join(outputDir, 'projects', 'PROJ', 'wikis.jsonl'), 'utf8')
+    expect(wikis).toBe('')
   })
 })
