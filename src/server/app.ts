@@ -41,10 +41,11 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
   // --- API ---
 
   // 接続テスト。APIキーはメモリ内のstateにのみ保持する。
+  // 開発・自動テスト用: フォーム値が空なら BACKLOG_DOMAIN / BACKLOG_API_KEY 環境変数を使う
   app.post('/api/connect', async (c) => {
     const body = await c.req.json<{ spaceDomain?: string; apiKey?: string }>()
-    const spaceDomain = body.spaceDomain?.trim()
-    const apiKey = body.apiKey?.trim()
+    const spaceDomain = body.spaceDomain?.trim() || process.env.BACKLOG_DOMAIN?.trim()
+    const apiKey = body.apiKey?.trim() || process.env.BACKLOG_API_KEY?.trim()
     if (!spaceDomain || !apiKey) {
       return c.json({ ok: false, error: 'スペースドメインとAPIキーを入力してください' }, 400)
     }
@@ -191,6 +192,7 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
 
   app.get('/api/status', (c) => {
     return c.json({
+      envCredentials: Boolean(process.env.BACKLOG_DOMAIN && process.env.BACKLOG_API_KEY),
       connected: state.connection !== null,
       spaceName: state.connection?.spaceName ?? null,
       spaceDomain: state.connection?.spaceDomain ?? null,

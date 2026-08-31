@@ -25,7 +25,8 @@ serve({ fetch: app.fetch, port: PORT, hostname: '127.0.0.1' }, (info) => {
   const url = `http://localhost:${info.port}`
   console.log(`backle を起動しました: ${url}`)
   console.log('データはあなたのPCの外には送信されません。終了するには Ctrl+C を押してください。')
-  openBrowser(url)
+  // 開発・自動テスト用: ブラウザの自動オープンを抑制
+  if (!process.env.BACKLE_NO_OPEN) openBrowser(url)
 })
 
 function openBrowser(url: string): void {
