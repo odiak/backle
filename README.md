@@ -1,5 +1,7 @@
 # backle
 
+> 🇬🇧 English version: [see below](#backle-english)
+
 **backle**（バックル）は、Backlogのプロジェクトデータ（課題・コメント・Wiki・添付ファイル）を、
 **あなた自身のPC上で**丸ごとエクスポートするGUI付きのオープンソースツール（Backlog exporter）です。
 
@@ -74,5 +76,90 @@ pnpm typecheck    # 型チェック
 本ツールは株式会社ヌーラボおよびBacklogとは無関係の非公式ツールです。
 
 ## ライセンス
+
+MIT License — Copyright (c) 2026 Kaido Iwamoto
+
+---
+
+# backle (English)
+
+**backle** is an open-source GUI tool (a Backlog exporter) that exports your
+[Backlog](https://backlog.com/) project data — issues, comments, wikis, and attachments —
+entirely **on your own PC**.
+
+- Save your Backlog data locally for backup or for migrating to other services.
+  The output is a generic, service-independent format
+- **Your data never leaves your PC.** The tool runs as a local server on your machine,
+  and all Backlog API requests are made directly from your PC
+- Your API key is kept in memory only and is never written to disk
+- The output format is an open specification ([docs/format-v1.md](docs/format-v1.md))
+
+## Usage
+
+Requires Node.js 20 or later.
+
+```sh
+npx backle
+```
+
+This starts a local server ( http://localhost:7810 ) and opens your browser.
+Then just follow the on-screen steps:
+
+1. **Connect** — Enter your Backlog space domain (`example.backlog.jp` / `example.backlog.com`)
+   and API key. You can issue an API key from Backlog's "Personal Settings → API".
+   A key from a user with administrator privileges is recommended for exporting
+   all projects and all user information.
+2. **Select projects** — Choose the projects to export, whether to include attachments,
+   and the output folder.
+3. **Run** — Progress is displayed. When the Backlog API rate limit is reached, the tool
+   waits automatically. If interrupted, re-run with the same output folder to resume
+   where it left off.
+4. **Done** — The exported data is saved in the output folder.
+
+## Exported data
+
+```
+output/
+  manifest.json        # export metadata
+  users.json           # user list
+  projects/{projectKey}/
+    project.json       # project settings
+    issues.jsonl       # issues (one per line)
+    comments.jsonl     # comments and change logs (one per line)
+    wikis.jsonl        # wikis with history (one per line)
+    attachments/       # attachment files
+```
+
+See [docs/format-v1.md](docs/format-v1.md) for details.
+Data is saved as-is from the Backlog API responses without transformation,
+so it works both as a backup and as migration data between tools.
+
+## Rate limits
+
+The Backlog API has per-user, per-category rate limits per minute.
+This tool fetches the limits dynamically at startup and monitors the remaining
+request count while running. When the limit is reached, it automatically waits
+until the reset time, so you can leave it running until it completes.
+(Large spaces may take several hours. Interruption and resumption are supported.)
+
+## Development
+
+```sh
+pnpm install
+pnpm build        # build server + GUI
+pnpm dev          # start local server (run pnpm build:gui first)
+pnpm dev:gui      # GUI dev server (Vite; API proxied to :7810)
+pnpm test         # unit tests
+pnpm typecheck    # type check
+```
+
+## Disclaimer
+
+This tool is provided as-is, without warranty of any kind (MIT License).
+Completeness of the exported data is not guaranteed. When migrating important data,
+always verify the export results yourself.
+This is an unofficial tool, unaffiliated with Nulab Inc. or Backlog.
+
+## License
 
 MIT License — Copyright (c) 2026 Kaido Iwamoto
