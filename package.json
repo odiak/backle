@@ -1,6 +1,6 @@
 {
   "name": "@odiak/bckle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Backlog exporter — Backlogのデータをあなた自身のPC上でエクスポートするGUI付きツール",
   "keywords": [
     "backlog",

@@ -20,7 +20,7 @@ import {
 
 export const FORMAT_VERSION = '1'
 export const TOOL_NAME = 'bckle'
-export const TOOL_VERSION = '0.1.0'
+export const TOOL_VERSION = '0.2.0'
 
 export interface ExporterOptions {
   client: BacklogClient
