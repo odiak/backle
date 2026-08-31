@@ -62,7 +62,7 @@ Backlog APIにはユーザー・API種別ごとの毎分のレート制限があ
 ```sh
 pnpm install
 pnpm build        # サーバー + GUI をビルド
-pnpm dev          # ローカルサーバー起動（要: 事前に pnpm build:gui）
+pnpm dev          # ビルドしてローカルサーバー起動
 pnpm dev:gui      # GUI開発サーバー（Vite。APIは :7810 にプロキシ）
 pnpm test         # ユニットテスト
 pnpm typecheck    # 型チェック
@@ -160,7 +160,7 @@ until the reset time, so you can leave it running until it completes.
 ```sh
 pnpm install
 pnpm build        # build server + GUI
-pnpm dev          # start local server (run pnpm build:gui first)
+pnpm dev          # build and start the local server
 pnpm dev:gui      # GUI dev server (Vite; API proxied to :7810)
 pnpm test         # unit tests
 pnpm typecheck    # type check
