@@ -12,8 +12,11 @@ mac:
     - target: dmg
       arch: universal
   category: public.app-category.developer-tools
-  # 署名・公証はCIで環境変数（CSC_LINK等）が設定されている場合のみ行われる。
-  # 未設定ならelectron-builderが自動でスキップし、未署名ビルドになる。
+  hardenedRuntime: true
+  # 公証はAPPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID が
+  # 設定されている場合のみ実行される（未設定ならスキップされ未署名/未公証ビルド）。
+  # 署名はCSC_LINK / CSC_KEY_PASSWORD（CI）またはローカルのキーチェーン。
+  notarize: true
 win:
   target:
     - target: nsis
