@@ -1,8 +1,8 @@
-# backle
+# bckle
 
-> 🇬🇧 English version: [see below](#backle-english)
+> 🇬🇧 English version: [see below](#bckle-english)
 
-**backle**（バックル）は、Backlogのプロジェクトデータ（課題・コメント・Wiki・添付ファイル）を、
+**bckle**（バックル）は、Backlogのプロジェクトデータ（課題・コメント・Wiki・添付ファイル）を、
 **あなた自身のPC上で**丸ごとエクスポートするGUI付きのオープンソースツール（Backlog exporter）です。
 
 - バックアップや他サービスへの移行のために、Backlogのデータを手元に保存できます。
@@ -17,7 +17,7 @@
 Node.js 20以上が必要です。
 
 ```sh
-npx backle
+npx bckle
 ```
 
 を実行すると、ローカルサーバー（ http://localhost:7810 ）が起動し、ブラウザが開きます。
@@ -89,9 +89,9 @@ MIT License — Copyright (c) 2026 Kaido Iwamoto
 
 ---
 
-# backle (English)
+# bckle (English)
 
-**backle** is an open-source GUI tool (a Backlog exporter) that exports your
+**bckle** is an open-source GUI tool (a Backlog exporter) that exports your
 [Backlog](https://backlog.com/) project data — issues, comments, wikis, and attachments —
 entirely **on your own PC**.
 
@@ -107,7 +107,7 @@ entirely **on your own PC**.
 Requires Node.js 20 or later.
 
 ```sh
-npx backle
+npx bckle
 ```
 
 This starts a local server ( http://localhost:7810 ) and opens your browser.

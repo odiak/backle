@@ -16,7 +16,7 @@ function startServer(): Promise<number> {
   const { app: hono } = createApp({ guiDir })
   return new Promise((resolve) => {
     // 既定はポート0（OSに空きポートを割り当てさせ、npx版の7810と衝突しない）
-    const port = Number(process.env.BACKLE_PORT ?? 0)
+    const port = Number(process.env.BCKLE_PORT ?? 0)
     server = serve({ fetch: hono.fetch, port, hostname: '127.0.0.1' }, (info) => {
       resolve(info.port)
     })
@@ -28,7 +28,7 @@ async function createWindow(): Promise<void> {
   const win = new BrowserWindow({
     width: 900,
     height: 720,
-    title: 'backle',
+    title: 'bckle',
     webPreferences: {
       // GUIはlocalhostのサーバーから配信される通常のWebページ。Node統合は不要
       nodeIntegration: false,

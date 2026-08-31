@@ -45,7 +45,7 @@ describe.runIf(env !== null)('実Backlogスペースとの結合テスト', () =
     const projectKeys = projects.map((p) => p.projectKey)
     console.log(`プロジェクト: ${projectKeys.join(', ')}`)
 
-    outputDir = await mkdtemp(join(tmpdir(), 'backle-integration-'))
+    outputDir = await mkdtemp(join(tmpdir(), 'bckle-integration-'))
     const events: ExporterEvent[] = []
     const exporter = new Exporter({
       client,
@@ -67,7 +67,7 @@ describe.runIf(env !== null)('実Backlogスペースとの結合テスト', () =
 
     const manifest = JSON.parse(await readFile(join(outputDir, 'manifest.json'), 'utf8'))
     expect(manifest.formatVersion).toBe('1')
-    expect(manifest.tool.name).toBe('backle')
+    expect(manifest.tool.name).toBe('bckle')
     expect(manifest.projects).toEqual(projectKeys)
 
     const users = JSON.parse(await readFile(join(outputDir, 'users.json'), 'utf8'))

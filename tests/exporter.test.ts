@@ -29,7 +29,7 @@ describe('Exporter', () => {
   let outputDir: string
 
   beforeEach(async () => {
-    outputDir = await mkdtemp(join(tmpdir(), 'backle-test-'))
+    outputDir = await mkdtemp(join(tmpdir(), 'bckle-test-'))
   })
 
   afterEach(async () => {

@@ -1,5 +1,5 @@
 {
-  "name": "backle",
+  "name": "bckle",
   "version": "0.1.0",
   "description": "Backlog exporter — Backlogのデータをあなた自身のPC上でエクスポートするGUI付きツール",
   "keywords": [
@@ -9,14 +9,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/odiak/backle.git"
+    "url": "https://github.com/odiak/bckle.git"
   },
   "license": "MIT",
   "author": "Kaido Iwamoto",
   "type": "module",
   "main": "dist-electron/electron/main.js",
   "bin": {
-    "backle": "./dist/cli.js"
+    "bckle": "./dist/cli.js"
   },
   "files": [
     "dist",

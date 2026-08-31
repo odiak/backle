@@ -19,7 +19,7 @@ import {
 } from './progress.js'
 
 export const FORMAT_VERSION = '1'
-export const TOOL_NAME = 'backle'
+export const TOOL_NAME = 'bckle'
 export const TOOL_VERSION = '0.1.0'
 
 export interface ExporterOptions {

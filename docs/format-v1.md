@@ -1,8 +1,8 @@
-# backle 出力形式 v1（公開仕様）
+# bckle 出力形式 v1（公開仕様）
 
 **形式バージョン: 1**
 
-backle が出力するエクスポートデータの形式仕様です。
+bckle が出力するエクスポートデータの形式仕様です。
 この形式は公開仕様であり、後方互換を保ちながら発展させます。
 形式に非互換な変更を行う場合はバージョン番号を上げます。
 
@@ -37,7 +37,7 @@ export/
 ```json
 {
   "formatVersion": "1",
-  "tool": { "name": "backle", "version": "0.1.0" },
+  "tool": { "name": "bckle", "version": "0.1.0" },
   "exportedAt": "2026-08-31T12:00:00.000Z",
   "space": { "domain": "example.backlog.jp", "spaceKey": "example", "name": "..." },
   "options": { "includeAttachments": true },

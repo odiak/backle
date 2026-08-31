@@ -1,5 +1,5 @@
-appId: net.odiak.backle
-productName: backle
+appId: net.odiak.bckle
+productName: bckle
 directories:
   output: release
 files:
