@@ -7,6 +7,9 @@ files:
   - dist-electron/**
   - docs/format-v1.md
   - package.json
+# アイコンは scripts/generate-icon.mjs で生成した build/icon.png を
+# electron-builderが各プラットフォーム形式（icns/ico）に変換する
+icon: build/icon.png
 mac:
   target:
     - target: dmg

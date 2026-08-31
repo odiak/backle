@@ -1,5 +1,7 @@
 # bckle
 
+<img src="build/icon.png" width="128" height="128" alt="bckle icon" />
+
 > 🇬🇧 English version: [see below](#bckle-english)
 
 **bckle**（バックル）は、Backlogのプロジェクトデータ（課題・コメント・Wiki・添付ファイル）を、
