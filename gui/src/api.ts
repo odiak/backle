@@ -3,6 +3,8 @@ export interface ProjectSummary {
   projectKey: string
   name: string
   archived: boolean
+  /** 自分が参加しているか。非参加プロジェクトはBacklogの仕様上データを取得できない */
+  joined: boolean
 }
 
 export interface ConnectResult {

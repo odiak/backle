@@ -74,16 +74,22 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
   app.get('/api/projects', async (c) => {
     if (!state.client) return c.json({ ok: false, error: '未接続です' }, 400)
     try {
-      const projects = await state.client.fetchAll<BacklogProject>('/api/v2/projects', {
-        all: true,
-      })
+      // all=true は管理者のみ有効で、非所属プロジェクトも一覧に載る。
+      // ただしBacklogの仕様上、管理者でも非所属プロジェクトの中身は取得できないため、
+      // 所属一覧（allなし）との差分で joined を判定し、GUI側で選択不可にする。
+      const [all, joined] = await Promise.all([
+        state.client.fetchAll<BacklogProject>('/api/v2/projects', { all: true }),
+        state.client.fetchAll<BacklogProject>('/api/v2/projects'),
+      ])
+      const joinedIds = new Set(joined.map((p) => p.id))
       return c.json({
         ok: true,
-        projects: projects.map((p) => ({
+        projects: all.map((p) => ({
           id: p.id,
           projectKey: p.projectKey,
           name: p.name,
           archived: p.archived ?? false,
+          joined: joinedIds.has(p.id),
         })),
       })
     } catch (e) {
