@@ -107,6 +107,13 @@ export function SelectStep({
     <div className="space-y-6">
       <p className="text-sm text-gray-600">
         スペース「{spaceName}」に接続しました。エクスポートするプロジェクトを選択してください。
+        <button
+          type="button"
+          onClick={onBack}
+          className="ml-2 text-xs font-medium text-blue-600 underline"
+        >
+          別のスペースに接続し直す
+        </button>
       </p>
 
       <div>

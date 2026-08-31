@@ -24,6 +24,13 @@ export function App() {
   const [spaceName, setSpaceName] = useState('')
   const [config, setConfig] = useState<ExportConfig | null>(null)
 
+  // 別スペースへの接続し直し（実行中以外のどの画面からでも）
+  const backToConnect = () => {
+    setSpaceName('')
+    setConfig(null)
+    setStep('connect')
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
       <header className="mb-8">
@@ -63,7 +70,7 @@ export function App() {
               setConfig(c)
               setStep('run')
             }}
-            onBack={() => setStep('connect')}
+            onBack={backToConnect}
           />
         )}
         {step === 'run' && config && (
@@ -74,7 +81,11 @@ export function App() {
           />
         )}
         {step === 'done' && config && (
-          <DoneStep outputDir={config.outputDir} onRestart={() => setStep('select')} />
+          <DoneStep
+            outputDir={config.outputDir}
+            onRestart={() => setStep('select')}
+            onReconnect={backToConnect}
+          />
         )}
       </main>
     </div>

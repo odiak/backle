@@ -47,6 +47,10 @@ export function createApp(options: CreateAppOptions): { app: Hono; state: AppSta
   // 接続テスト。APIキーはメモリ内のstateにのみ保持する。
   // 開発・自動テスト用: フォーム値が空なら BACKLOG_DOMAIN / BACKLOG_API_KEY 環境変数を使う
   app.post('/api/connect', async (c) => {
+    // 実行中のジョブがある間の接続切り替えは不可（バックグラウンドのジョブが迷子になるため）
+    if (state.job && state.job.status === 'running') {
+      return c.json({ ok: false, error: 'エクスポートの実行中は接続を変更できません' }, 409)
+    }
     const body = await c.req.json<{ spaceDomain?: string; apiKey?: string }>()
     const spaceDomain = body.spaceDomain?.trim() || process.env.BACKLOG_DOMAIN?.trim()
     const apiKey = body.apiKey?.trim() || process.env.BACKLOG_API_KEY?.trim()

@@ -4,9 +4,11 @@ import { openOutputFolder } from '../api'
 export function DoneStep({
   outputDir,
   onRestart,
+  onReconnect,
 }: {
   outputDir: string
   onRestart: () => void
+  onReconnect: () => void
 }) {
   const [openError, setOpenError] = useState<string | null>(null)
 
@@ -40,6 +42,12 @@ export function DoneStep({
           className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700"
         >
           別のプロジェクトをエクスポートする
+        </button>
+        <button
+          onClick={onReconnect}
+          className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700"
+        >
+          別のスペースに接続する
         </button>
       </div>
       {openError !== null && <p className="text-sm text-red-600">{openError}</p>}
